@@ -1,23 +1,13 @@
-import os
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from os import listdir
+from os.path import join
+from langchain_community.document_loaders import PyPDFLoader
 
-def load_and_split_pdfs_from_folder(folder_path: str):
-    # Get all PDF files in the folder
-    pdf_paths = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
-
-    # Setup chunking
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
-    all_chunks = []
-
-    for path in pdf_paths:
-        print(f"Loading: {path}")
-        loader = PyPDFLoader(path)
-        docs = loader.load()
-        chunks = splitter.split_documents(docs)
-        all_chunks.extend(chunks)
-
-    return all_chunks
-
-# Example usage
-documents = load_and_split_pdfs_from_folder("./policies")
+for fn in listdir("./policies"):
+    if not fn.lower().endswith(".pdf"):
+        continue
+    path = join("./policies", fn)
+    for doc in PyPDFLoader(path).load():
+        if "sick" in doc.page_content.lower():
+            print(f"{fn} (page {doc.metadata['page']}):")
+            print(doc.page_content[:200].replace("\n"," "))
+            print("---")
