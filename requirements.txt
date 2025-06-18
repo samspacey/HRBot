@@ -1,16 +1,13 @@
 # Core dependencies for Streamlit Cloud
-streamlit==1.39.0
-langchain==0.3.25
-langchain-community==0.3.25
-langchain-core==0.3.65
-langchain-text-splitters==0.3.8
-langchain-openai==0.2.16
-faiss-cpu==1.9.0
-tiktoken==0.8.0
-openai==1.58.1
+streamlit
+langchain
+langchain-community
+langchain-core
+langchain-text-splitters
+langchain-openai
+faiss-cpu
+tiktoken
+openai
 
 # File handling
-PyPDF2==3.0.1
-
-# Utilities (python-dotenv not needed on Streamlit Cloud)
-# python-dotenv==1.0.1
+PyPDF2
