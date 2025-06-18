@@ -6,8 +6,10 @@ An enterprise-grade intelligent chatbot framework that enables organizations to 
 
 ## ✨ Features
 
+- **📚 Interactive Document Upload**: Upload your own documents and chat with them instantly
 - **🎯 Multi-Domain Framework**: Create chatbots for any document type (HR, Legal, Technical, Financial, etc.)
 - **⚙️ YAML Configuration**: Simple configuration files for different domains and use cases
+- **📄 Multi-Format Support**: PDF, TXT, Markdown, and Word documents
 - **🔍 Advanced Document Processing**: Smart chunking strategies for optimal retrieval accuracy
 - **⚡ High Performance**: FAISS vector store with caching for sub-second response times
 - **🛡️ Enterprise Security**: Input validation, sanitization, and security scanning
@@ -51,6 +53,38 @@ make serve  # Opens web interface at http://localhost:8501
 ```
 
 **That's it!** 🎉 Your document chatbot is now running!
+
+### 📚 **NEW: Interactive Document Upload**
+
+Want to upload your own documents and create a custom chatbot instantly? Use the interactive mode:
+
+```bash
+# Launch the interactive upload interface
+python app_launcher.py --interactive
+
+# Or directly:
+streamlit run streamlit_interactive.py
+```
+
+**Features:**
+- 📁 **Drag & drop upload**: PDF, TXT, Markdown, Word documents
+- 🤖 **Custom chatbot**: Configure name, description, and icon
+- 🔍 **Real-time indexing**: Build search indexes from your uploads
+- 💬 **Instant chat**: Ask questions about your documents immediately
+- 📊 **Session management**: Each session maintains its own document collection
+
+### 🚀 **Easy App Launcher**
+
+Use the convenient launcher to switch between modes:
+
+```bash
+python app_launcher.py
+```
+
+This will show you an interactive menu to choose between:
+1. 📚 Interactive Upload Chatbot (upload your own documents)
+2. 📋 Domain-Based Chatbot (pre-configured domains)
+3. 📝 List Available Domains
 
 ### 🎯 **Creating Different Domain Chatbots**
 

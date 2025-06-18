@@ -11,6 +11,11 @@ openai
 
 # File handling
 PyPDF2
+python-docx
+python-magic-bin
 
 # Configuration
 PyYAML
+
+# Session and upload management
+uuid

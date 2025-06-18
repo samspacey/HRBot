@@ -166,6 +166,42 @@ class DocumentChatbot:
             logger.error(f"Error in document processing: {str(e)}")
             raise
     
+    def _split_document(self, document, chunk_size: Optional[int] = None, chunk_overlap: Optional[int] = None):
+        """
+        Split a single document into chunks using the configured chunking strategy.
+        
+        Args:
+            document: Single Document object to split
+            chunk_size: Maximum tokens per chunk
+            chunk_overlap: Overlap between chunks
+            
+        Returns:
+            List of Document chunks
+        """
+        chunk_size = chunk_size or self.domain_config.chunk_size
+        chunk_overlap = chunk_overlap or self.domain_config.chunk_overlap
+        
+        try:
+            chunker = create_chunker(
+                strategy="smart",
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+            
+            # Split the document
+            chunks = chunker.chunk_documents([document])
+            return chunks
+            
+        except Exception as e:
+            logger.error(f"Error splitting document: {str(e)}")
+            # Fallback to simple token splitting
+            text_splitter = TokenTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap
+            )
+            chunks = text_splitter.split_documents([document])
+            return chunks
+    
     def build_vectorstore(
         self,
         documents,
