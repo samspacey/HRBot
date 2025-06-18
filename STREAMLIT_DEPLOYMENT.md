@@ -111,6 +111,7 @@ The deployed app includes:
 
 **3. "Build failed" during deployment**
 - Solution: Check that `requirements.txt` and `packages.txt` are present
+- Note: `packages.txt` should not contain comments (no # lines)
 
 **4. PDF processing errors**
 - Solution: Ensure your PDFs are valid and not corrupted

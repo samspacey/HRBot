@@ -1,9 +1,3 @@
-# System packages required for Streamlit Cloud deployment
-# These packages will be installed via apt-get
-
-# Required for PDF processing
 poppler-utils
-
-# Required for some Python packages
 build-essential
 libffi-dev
