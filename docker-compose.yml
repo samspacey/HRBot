@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  hr-chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_PORT=8501
+      - POLICIES_FOLDER=/app/policies
+      - INDEX_PATH=/app/faiss_index_hr
+      - CACHE_ENABLED=true
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./policies:/app/policies:ro
+      - ./faiss_index_hr:/app/faiss_index_hr
+      - ./cache:/app/cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  # Development service with hot reload
+  hr-chatbot-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8502:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STREAMLIT_SERVER_HEADLESS=false
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_RUNONCERELOAD=true
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll
+      - POLICIES_FOLDER=/app/policies
+      - INDEX_PATH=/app/faiss_index_hr
+      - CACHE_ENABLED=true
+      - LOG_LEVEL=DEBUG
+      - DEBUG=true
+      - ENVIRONMENT=development
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+    command: streamlit run streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+    profiles:
+      - dev
+
+  # Jupyter notebook service for development
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8888:8888"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - .:/app
+      - ./notebooks:/app/notebooks
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+    profiles:
+      - dev
+
+networks:
+  default:
+    name: hr-chatbot-network
