@@ -1,3 +1,5 @@
 /.DS_Store
 /.venv
 /.faiss_index_hr
+/.devcontainer
+/.claude
