@@ -1,4 +1,4 @@
-# Core dependencies
+# Core dependencies for Streamlit Cloud
 streamlit==1.39.0
 langchain==0.3.25
 langchain-community==0.3.25
@@ -11,7 +11,6 @@ openai==1.58.1
 
 # File handling
 PyPDF2==3.0.1
-aiofiles==24.1.0
 
-# Utilities
-python-dotenv==1.0.1
+# Utilities (python-dotenv not needed on Streamlit Cloud)
+# python-dotenv==1.0.1

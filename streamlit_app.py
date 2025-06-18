@@ -7,52 +7,120 @@ from hr_chatbot import (
     answer_query,
 )
 
-st.set_page_config(page_title="HR Policy Chatbot")
-st.title("📄 HR Policy Chatbot")
+# Configure page
+st.set_page_config(
+    page_title="HR Policy Chatbot", 
+    page_icon="🤖",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# Sidebar for configuration
+# App header
+st.title("🤖 HR Policy Chatbot")
+st.markdown("*Ask questions about company HR policies using natural language*")
+
+# Check for API key - Streamlit Cloud uses secrets
+if "OPENAI_API_KEY" not in st.secrets:
+    st.error("⚠️ OpenAI API key not found! Please add it to Streamlit secrets.")
+    st.info("For Streamlit Cloud: Add OPENAI_API_KEY in the app's secrets section.")
+    st.stop()
+
+# Set environment variable for the app
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+
 # Sidebar for configuration
 with st.sidebar:
-    st.header("Configuration")
-    folder = st.text_input("Policies folder path", "./policies")
-    index_path = st.text_input("FAISS index path", "faiss_index_hr")
-    rebuild = st.button("Rebuild Index")
+    st.header("⚙️ Configuration")
+    
+    # Check if policies folder exists
+    folder = "./policies"
+    index_path = "faiss_index_hr"
+    
+    if not os.path.exists(folder):
+        st.error(f"📁 Policies folder '{folder}' not found!")
+        st.info("Please ensure your HR policy PDFs are in the policies/ folder.")
+        st.stop()
+    
+    # Show folder info
+    pdf_files = [f for f in os.listdir(folder) if f.lower().endswith('.pdf')]
+    st.success(f"📁 Found {len(pdf_files)} PDF files")
+    
+    # Rebuild option
+    rebuild = st.button("🔄 Rebuild Index", help="Rebuild the search index from scratch")
+    
+    # Advanced settings
+    with st.expander("🔧 Advanced Settings"):
+        k = st.slider("Source documents to retrieve", 1, 10, 4, 
+                     help="Higher values provide more context but slower responses")
 
-# Automatically build or load the FAISS index on startup (or when rebuilding)
-if "vectorstore" not in st.session_state or rebuild:
-    with st.spinner("Building or loading FAISS index..."):
-        # Try loading existing index unless forced to rebuild
-        if os.path.exists(index_path) and not rebuild:
-            try:
-                vs = load_vectorstore(index_path)
-            except Exception:
-                docs = load_and_split_pdfs(folder)
-                vs = build_vectorstore(docs, index_path=index_path)
-        else:
-            docs = load_and_split_pdfs(folder)
-            vs = build_vectorstore(docs, index_path=index_path)
-    st.session_state["vectorstore"] = vs
-    st.success("FAISS index is ready!")
+# Initialize vectorstore
+@st.cache_resource
+def initialize_vectorstore():
+    """Initialize and cache the vectorstore"""
+    if os.path.exists(index_path):
+        try:
+            return load_vectorstore(index_path)
+        except Exception as e:
+            st.warning(f"Failed to load existing index: {str(e)}")
+    
+    # Build new index
+    with st.spinner("🔨 Building search index from PDF files..."):
+        docs = load_and_split_pdfs(folder)
+        vs = build_vectorstore(docs, index_path=index_path)
+    return vs
 
-# Main chatbot UI
-st.subheader("Ask a question about your HR policies:")
-question = st.text_input("Your question:")
-k = st.slider("Number of source documents (k)", 1, 10, 4)
-ask_btn = st.button("Get Answer")
+# Load vectorstore (or rebuild if requested)
+if rebuild:
+    st.cache_resource.clear()
 
-if ask_btn:
-    if "vectorstore" not in st.session_state:
-        st.warning("Please build or load the FAISS index first.")
-    elif not question:
-        st.warning("Please enter a question.")
+try:
+    vectorstore = initialize_vectorstore()
+    st.sidebar.success("✅ Search index ready!")
+except Exception as e:
+    st.error(f"❌ Failed to initialize search index: {str(e)}")
+    st.stop()
+
+# Main chatbot interface
+st.markdown("---")
+col1, col2 = st.columns([3, 1])
+
+with col1:
+    question = st.text_input(
+        "💬 Ask a question about HR policies:",
+        placeholder="e.g., What is the vacation policy?",
+        help="Ask any question about your company's HR policies"
+    )
+
+with col2:
+    st.markdown("<br>", unsafe_allow_html=True)  # Add some space
+    ask_btn = st.button("🔍 Get Answer", type="primary", use_container_width=True)
+
+# Process query
+if ask_btn or question:
+    if not question:
+        st.warning("⚠️ Please enter a question.")
     else:
-        with st.spinner("Retrieving answer..."):
-            answer, docs = answer_query(question, st.session_state["vectorstore"], k=k)
-        st.subheader("Answer")
-        st.write(answer)
-        st.subheader("Source Documents")
-        for i, doc in enumerate(docs, start=1):
-            source = doc.metadata.get("source", "unknown")
-            page = doc.metadata.get("page", "")
-            st.markdown(f"**{i}. {source} (page {page})**")
-            st.write(doc.page_content)
+        with st.spinner("🤔 Thinking..."):
+            try:
+                answer, docs = answer_query(question, vectorstore, k=k)
+                
+                # Display answer
+                st.markdown("### 💡 Answer")
+                st.markdown(answer)
+                
+                # Display sources
+                if docs:
+                    st.markdown("### 📚 Source Documents")
+                    for i, doc in enumerate(docs, start=1):
+                        source = doc.metadata.get("source", "unknown")
+                        page = doc.metadata.get("page", "")
+                        
+                        with st.expander(f"📄 Source {i}: {os.path.basename(source)} (page {page})"):
+                            st.write(doc.page_content)
+                            
+            except Exception as e:
+                st.error(f"❌ Error processing query: {str(e)}")
+
+# Footer
+st.markdown("---")
+st.markdown("*Built with Streamlit, LangChain, and OpenAI*")

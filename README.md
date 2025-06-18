@@ -234,6 +234,26 @@ make docker-dev  # Starts all services with hot reload
 - `hr-chatbot-dev`: Development with hot reload
 - `jupyter`: Jupyter Lab for exploration
 
+## ☁️ Streamlit Cloud Deployment
+
+**✅ Ready for Streamlit Cloud!** The app is fully configured for cloud deployment.
+
+### Quick Deploy to Streamlit Cloud:
+
+1. **Push to GitHub:**
+```bash
+git push origin main
+```
+
+2. **Deploy on [share.streamlit.io](https://share.streamlit.io):**
+   - Connect your GitHub repository
+   - Set main file: `streamlit_app.py`
+   - Add your `OPENAI_API_KEY` in app secrets
+
+3. **Your app will be live at:** `https://your-app-name.streamlit.app`
+
+📖 **Detailed deployment guide:** See [STREAMLIT_DEPLOYMENT.md](STREAMLIT_DEPLOYMENT.md)
+
 ## 🧪 Testing & Quality
 
 ### Running Tests

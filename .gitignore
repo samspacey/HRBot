@@ -170,7 +170,7 @@ data/
 *.bin
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml
 
 # OS generated files
 Thumbs.db
