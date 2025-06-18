@@ -1,0 +1,56 @@
+# Technical Documentation Chatbot Domain Configuration
+name: "Technical Documentation Assistant"
+description: "Search technical documentation, API guides, and system manuals"
+domain: "technical"
+
+# UI Configuration
+ui:
+  title: "🔧 Technical Documentation Assistant"
+  page_title: "Technical Documentation Assistant"
+  page_icon: "🔧"
+  sidebar_title: "⚙️ Configuration"
+  footer: "Built with Streamlit, LangChain, and OpenAI"
+
+# Document Configuration
+documents:
+  folder: "./tech_docs"
+  folder_display_name: "Technical Documentation"
+  file_types: [".pdf", ".md"]
+  index_path: "faiss_index_tech"
+
+# Query Configuration
+query:
+  placeholder: "e.g., How do I configure the API authentication?"
+  help_text: "Ask questions about technical documentation and system guides"
+  button_text: "🔍 Search Tech Docs"
+  
+# Prompt Configuration
+prompts:
+  system_prompt: |
+    You are a technical documentation assistant. Below are excerpts from technical documentation and guides.
+
+    Context:
+    {context}
+
+    Question: {question}
+    Provide clear, technical answers based ONLY on the provided documentation.
+    Include code examples, configuration details, and step-by-step instructions when available.
+    If the information is not present, respond exactly with "I don't know."
+
+# Processing Configuration
+processing:
+  chunk_size: 800
+  chunk_overlap: 200
+  default_k: 6
+  max_k: 12
+
+# Error Messages
+messages:
+  no_folder: "📁 {folder} folder not found!"
+  no_folder_help: "Please ensure your technical documentation is in the {folder} folder."
+  no_api_key: "⚠️ OpenAI API key not found! Please add it to Streamlit secrets."
+  api_key_help: "For Streamlit Cloud: Add OPENAI_API_KEY in the app's secrets section."
+  no_question: "⚠️ Please enter a technical question."
+  processing_error: "❌ Error processing technical query: {error}"
+  index_ready: "✅ Technical documentation index ready!"
+  found_files: "📁 Found {count} technical documents"

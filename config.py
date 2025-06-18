@@ -23,9 +23,13 @@ class Config:
     chunk_size: int = 500
     chunk_overlap: int = 100
     
-    # Vector store settings
+    # Vector store settings (can be overridden by domain config)
     index_path: str = "faiss_index_hr"
     policies_folder: str = "./policies"
+    
+    # Domain configuration
+    chatbot_domain: str = "hr"
+    domains_folder: str = "./domains"
     
     # Query settings
     default_k: int = 4
@@ -75,6 +79,9 @@ def load_config() -> Config:
         
         index_path=os.getenv("INDEX_PATH", "faiss_index_hr"),
         policies_folder=os.getenv("POLICIES_FOLDER", "./policies"),
+        
+        chatbot_domain=os.getenv("CHATBOT_DOMAIN", "hr"),
+        domains_folder=os.getenv("DOMAINS_FOLDER", "./domains"),
         
         default_k=int(os.getenv("DEFAULT_K", "4")),
         max_k=int(os.getenv("MAX_K", "10")),

@@ -1,0 +1,56 @@
+# Financial Policies Chatbot Domain Configuration
+name: "Financial Policy Assistant"
+description: "Search financial policies, accounting procedures, and compliance documentation"
+domain: "financial"
+
+# UI Configuration
+ui:
+  title: "💰 Financial Policy Assistant"
+  page_title: "Financial Policy Assistant"
+  page_icon: "💰"
+  sidebar_title: "⚙️ Configuration"
+  footer: "Built with Streamlit, LangChain, and OpenAI"
+
+# Document Configuration
+documents:
+  folder: "./financial_docs"
+  folder_display_name: "Financial Documents"
+  file_types: [".pdf"]
+  index_path: "faiss_index_financial"
+
+# Query Configuration
+query:
+  placeholder: "e.g., What are the expense reporting requirements?"
+  help_text: "Ask questions about financial policies and accounting procedures"
+  button_text: "🔍 Search Financial Docs"
+  
+# Prompt Configuration
+prompts:
+  system_prompt: |
+    You are a financial policy expert and accounting assistant. Below are excerpts from financial policies and procedures.
+
+    Context:
+    {context}
+
+    Question: {question}
+    Provide accurate financial guidance based ONLY on the provided policies and procedures.
+    Include specific policy references, compliance requirements, and procedural steps when available.
+    If the information is not present, respond exactly with "I don't know."
+
+# Processing Configuration
+processing:
+  chunk_size: 500
+  chunk_overlap: 100
+  default_k: 4
+  max_k: 12
+
+# Error Messages
+messages:
+  no_folder: "📁 {folder} folder not found!"
+  no_folder_help: "Please ensure your financial documents are in the {folder} folder."
+  no_api_key: "⚠️ OpenAI API key not found! Please add it to Streamlit secrets."
+  api_key_help: "For Streamlit Cloud: Add OPENAI_API_KEY in the app's secrets section."
+  no_question: "⚠️ Please enter a financial policy question."
+  processing_error: "❌ Error processing financial query: {error}"
+  index_ready: "✅ Financial policy index ready!"
+  found_files: "📁 Found {count} financial documents"

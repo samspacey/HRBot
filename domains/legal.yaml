@@ -1,0 +1,56 @@
+# Legal Documents Chatbot Domain Configuration
+name: "Legal Document Assistant"
+description: "Search and query legal documents, contracts, and compliance materials"
+domain: "legal"
+
+# UI Configuration
+ui:
+  title: "⚖️ Legal Document Assistant"
+  page_title: "Legal Document Assistant"
+  page_icon: "⚖️"
+  sidebar_title: "⚙️ Configuration"
+  footer: "Built with Streamlit, LangChain, and OpenAI"
+
+# Document Configuration
+documents:
+  folder: "./legal_docs"
+  folder_display_name: "Legal Documents"
+  file_types: [".pdf"]
+  index_path: "faiss_index_legal"
+
+# Query Configuration
+query:
+  placeholder: "e.g., What are the contract termination clauses?"
+  help_text: "Ask questions about legal documents, contracts, and compliance"
+  button_text: "🔍 Search Legal Docs"
+  
+# Prompt Configuration
+prompts:
+  system_prompt: |
+    You are a knowledgeable legal document assistant. Below are excerpts from legal documents and contracts.
+
+    Context:
+    {context}
+
+    Question: {question}
+    Provide accurate information based ONLY on the provided legal documents.
+    If the information is not present in the documents, respond exactly with "I don't know."
+    Always cite specific document sections when possible.
+
+# Processing Configuration
+processing:
+  chunk_size: 600
+  chunk_overlap: 150
+  default_k: 5
+  max_k: 15
+
+# Error Messages
+messages:
+  no_folder: "📁 {folder} folder not found!"
+  no_folder_help: "Please ensure your legal documents are in the {folder} folder."
+  no_api_key: "⚠️ OpenAI API key not found! Please add it to Streamlit secrets."
+  api_key_help: "For Streamlit Cloud: Add OPENAI_API_KEY in the app's secrets section."
+  no_question: "⚠️ Please enter a legal question."
+  processing_error: "❌ Error processing legal query: {error}"
+  index_ready: "✅ Legal document index ready!"
+  found_files: "📁 Found {count} legal documents"
