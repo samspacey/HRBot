@@ -1,5 +1,7 @@
 # Document Chatbot Framework
 
+Note: This repository has been simplified to a minimal Streamlit proof-of-concept. Many advanced features mentioned below (multi-domain, CLI, async, upload workflows) have been removed to keep the demo focused. To run: place a few PDFs in `policies/` and start `streamlit_app.py`. The app will build the index automatically on first run.
+
 An enterprise-grade intelligent chatbot framework that enables organizations to create domain-specific document query assistants using natural language. The system uses Retrieval-Augmented Generation (RAG) architecture with advanced document processing, caching, and validation to provide accurate, context-aware answers from any document collection.
 
 **🎯 Multi-Domain Support:** Easily create chatbots for HR policies, legal documents, technical documentation, financial procedures, and more with simple YAML configuration files.
@@ -42,10 +44,14 @@ nano .env  # or use any text editor
 # Add: OPENAI_API_KEY=your_actual_openai_api_key_here
 ```
 
-3. **📚 Build Search Index:**
-```bash
-make index  # Processes PDF files in policies/ folder (HR domain by default)
+3. **🔑 Add Your OpenAI API Key:**
+Export it in your shell so the app can read it:
 ```
+export OPENAI_API_KEY=sk-your-real-key
+```
+
+4. **📚 Add Documents:**
+Place a few PDF files into the `policies/` folder. The app builds the FAISS index automatically on first run.
 
 4. **🚀 Start the App:**
 ```bash
@@ -54,62 +60,14 @@ make serve  # Opens web interface at http://localhost:8501
 
 **That's it!** 🎉 Your document chatbot is now running!
 
-### 📚 **NEW: Interactive Document Upload**
+### 📚 Interactive Uploads
+Removed in this POC to keep the demo simple. Uploading via the UI may return in a future iteration.
 
-Want to upload your own documents and create a custom chatbot instantly? Use the interactive mode:
-
-```bash
-# Launch the interactive upload interface
-python app_launcher.py --interactive
-
-# Or directly:
-streamlit run streamlit_interactive.py
-```
-
-**Features:**
-- 📁 **Drag & drop upload**: PDF, TXT, Markdown, Word documents
-- 🤖 **Custom chatbot**: Configure name, description, and icon
-- 🔍 **Real-time indexing**: Build search indexes from your uploads
-- 💬 **Instant chat**: Ask questions about your documents immediately
-- 📊 **Session management**: Each session maintains its own document collection
-
-### 🚀 **Easy App Launcher**
-
-Use the convenient launcher to switch between modes:
-
-```bash
-python app_launcher.py
-```
-
-This will show you an interactive menu to choose between:
-1. 📚 Interactive Upload Chatbot (upload your own documents)
-2. 📋 Domain-Based Chatbot (pre-configured domains)
-3. 📝 List Available Domains
-
-### 🎯 **Creating Different Domain Chatbots**
-
-Want to create a chatbot for legal documents, technical docs, or financial policies? Use the domain generator:
-
-```bash
-# Interactive mode - guided setup
-python create_domain.py --interactive
-
-# Command line mode - quick setup
-python create_domain.py --domain legal --name "Legal Document Assistant" --icon "⚖️"
-
-# Switch to your new domain
-CHATBOT_DOMAIN=legal python cli.py --index
-CHATBOT_DOMAIN=legal streamlit run streamlit_app.py
-```
+### 🎯 Multi-Domain and Generators
+Removed in this POC. The demo targets a single `policies/` folder for simplicity.
 
 ### Alternative Ways to Run
-
-**Command Line Interface:**
-```bash
-make query QUESTION="What is the vacation policy?"
-# Or for different domains:
-CHATBOT_DOMAIN=legal make query QUESTION="What are the contract terms?"
-```
+CLI and domain switching have been removed in this POC.
 
 **Docker (if you prefer containers):**
 ```bash
@@ -117,10 +75,8 @@ docker build -t document-chatbot .
 docker run -p 8501:8501 --env-file .env document-chatbot
 ```
 
-**Development Mode (with hot reload):**
-```bash
-make docker-dev  # Full development environment
-```
+**Development Mode (with hot reload):** Use `make serve` locally or build a Docker image with `make docker-build`.
+The app reads `OPENAI_API_KEY` from your environment; no `.env` file is required.
 
 ### ⚠️ Troubleshooting
 
@@ -136,18 +92,14 @@ make docker-dev  # Full development environment
 ## 📚 Usage
 
 ### Development Commands
-
-The Makefile provides convenient commands for all development tasks:
-
+Useful commands:
 ```bash
-make help              # Show all available commands
-make setup-dev         # Set up development environment
-make test              # Run all tests
-make lint              # Run code linting
-make format            # Format code with black and isort
-make serve             # Start web interface
-make index             # Build search index
-make docker-dev        # Start development with Docker
+make help         # Show available commands
+make setup-dev    # Install deps and create .env
+make format       # Black + isort
+make lint         # Flake8
+make type-check   # mypy
+make serve        # Start Streamlit UI
 ```
 
 ### Web Interface (Streamlit)
@@ -160,120 +112,16 @@ make serve
 Navigate to `http://localhost:8501` for the interactive chatbot interface.
 
 ### Command Line Interface
-
-```bash
-# Build the index
-make index
-
-# Ask questions
-make query QUESTION="What is the sick leave policy?"
-
-# Direct CLI usage
-python cli.py --query "How many vacation days do I get?" --k 5
-```
+Not available in this POC. Use the Streamlit UI.
 
 ### Python API
-
-```python
-from hr_chatbot import load_vectorstore, answer_query
-from services import create_hr_service
-
-# Method 1: Direct usage
-vectorstore = load_vectorstore("faiss_index_hr")
-answer, sources = answer_query("What is the remote work policy?", vectorstore)
-
-# Method 2: Service-based approach (recommended)
-hr_service = create_hr_service()
-vectorstore = await hr_service.load_index()
-answer, sources = await hr_service.answer_query("What is the remote work policy?", vectorstore)
-```
+If needed, see `simple_rag.py` for minimal functions to load/build the index and answer queries.
 
 ### Async Usage
-
-```python
-import asyncio
-from async_hr_chatbot import AsyncHRChatbot
-
-async def main():
-    async with AsyncHRChatbot() as chatbot:
-        vectorstore = await chatbot.load_vectorstore_async()
-        answer, docs = await chatbot.answer_query_async(
-            "What is the vacation policy?", 
-            vectorstore
-        )
-        print(answer)
-
-asyncio.run(main())
-```
+Not applicable for this POC.
 
 ## 🎯 Domain Configuration
-
-The framework supports multiple document types through YAML configuration files. Each domain can have its own branding, prompts, and document processing settings.
-
-### Available Domains
-
-- **HR** (`domains/hr.yaml`) - Human resources policies and procedures
-- **Legal** (`domains/legal.yaml`) - Legal documents and contracts
-- **Technical** (`domains/technical.yaml`) - Technical documentation and manuals
-- **Financial** (`domains/financial.yaml`) - Financial policies and procedures
-
-### Creating New Domains
-
-Use the domain generator to create new chatbot configurations:
-
-```bash
-# Interactive mode with guided setup
-python create_domain.py --interactive
-
-# Command line mode for quick setup
-python create_domain.py --domain medical --name "Medical Records Assistant" --icon "🏥"
-
-# Create with custom settings
-python create_domain.py --domain compliance \
-  --name "Compliance Assistant" \
-  --description "Search compliance documents and regulations" \
-  --icon "📋" \
-  --create-folder
-```
-
-### Domain Configuration Structure
-
-Each domain configuration includes:
-
-```yaml
-name: "Legal Document Assistant"
-description: "Search and query legal documents"
-domain: "legal"
-ui:
-  title: "⚖️ Legal Document Assistant"
-  page_icon: "⚖️"
-documents:
-  folder: "./legal_docs"
-  folder_display_name: "Legal Documents"
-  file_types: [".pdf"]
-  index_path: "faiss_index_legal"
-query:
-  placeholder: "e.g., What are the contract terms?"
-  help_text: "Ask questions about legal documents"
-prompts:
-  system_prompt: "You are a legal document assistant..."
-processing:
-  chunk_size: 500
-  chunk_overlap: 100
-```
-
-### Switching Between Domains
-
-```bash
-# Set environment variable
-export CHATBOT_DOMAIN=legal
-
-# Or use inline for specific commands
-CHATBOT_DOMAIN=technical python cli.py --query "How do I configure the API?"
-
-# Web interface with specific domain
-CHATBOT_DOMAIN=financial streamlit run streamlit_app.py
-```
+Removed in this POC.
 
 ## 🏗️ Architecture
 
@@ -282,33 +130,15 @@ CHATBOT_DOMAIN=financial streamlit run streamlit_app.py
 ```
 HRBot/
 ├── 📁 Core Application
-│   ├── document_chatbot.py    # Main chatbot functionality (domain-agnostic)
-│   ├── domain_config.py       # Domain configuration system
-│   ├── async_hr_chatbot.py    # Async implementation
-│   ├── config.py              # Configuration management
-│   ├── validation.py          # Input validation & security
-│   ├── cache.py               # Caching system
-│   ├── chunking.py            # Smart document chunking
-│   └── services.py            # Service layer with DI
+│   ├── simple_rag.py          # Minimal RAG helper
+│   └── config.py              # Configuration management
 ├── 📁 Interfaces
-│   ├── cli.py                 # Command line interface
-│   ├── streamlit_app.py       # Web interface
-│   ├── create_domain.py       # Domain generator tool
-│   └── query.py               # Query utilities
-├── 📁 Domain Configurations
-│   ├── domains/hr.yaml        # HR domain configuration
-│   ├── domains/legal.yaml     # Legal domain configuration
-│   ├── domains/technical.yaml # Technical domain configuration
-│   └── domains/financial.yaml # Financial domain configuration
+│   └── streamlit_app.py       # Web interface
 ├── 📁 Infrastructure
 │   ├── Dockerfile             # Production container
 │   ├── Dockerfile.dev         # Development container
 │   ├── docker-compose.yml     # Multi-service setup
 │   └── Makefile               # Development commands
-├── 📁 Testing
-│   ├── tests/unit/            # Unit tests
-│   ├── tests/integration/     # Integration tests
-│   └── tests/fixtures/        # Test fixtures
 ├── 📁 Configuration
 │   ├── .env.example           # Environment template
 │   ├── .pre-commit-config.yaml # Code quality hooks
@@ -316,23 +146,13 @@ HRBot/
 │   ├── requirements.txt       # Production dependencies
 │   └── requirements-dev.txt   # Development dependencies
 └── 📁 Data
-    ├── policies/              # HR policy documents
-    ├── legal_docs/            # Legal documents
-    ├── tech_docs/             # Technical documentation
-    ├── financial_docs/        # Financial documents
-    ├── faiss_index_hr/        # HR vector store index
-    ├── faiss_index_legal/     # Legal vector store index
-    └── cache/                 # Application cache
+    ├── policies/              # Demo PDFs
+    └── faiss_index_hr/        # Vector index (generated)
 ```
 
 ### Key Components
-
-- **🎯 Domain System**: YAML-based configuration for different document types
-- **🧠 Smart Chunking**: Context-aware document splitting for better retrieval
-- **⚡ Caching Layer**: Multi-level caching (query results, embeddings)
-- **🛡️ Security**: Input validation, sanitization, and threat detection
-- **📊 Monitoring**: Comprehensive logging and performance metrics
-- **🔧 Service Layer**: Dependency injection for better testability
+- Minimal RAG using FAISS, OpenAI embeddings, and ChatGPT via LangChain
+- Streamlit UI for simple Q&A over local PDFs
 
 ## ⚙️ Configuration
 
@@ -363,9 +183,7 @@ docker run -p 8501:8501 --env-file .env document-chatbot
 ```
 
 ### Development
-```bash
-make docker-dev  # Starts all services with hot reload
-```
+Use local `make serve` or Docker build/run commands above.
 
 ### Docker Compose Services
 - `document-chatbot`: Production service
